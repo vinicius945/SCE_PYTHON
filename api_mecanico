@@ -1,0 +1,57 @@
+from flask import Flask, jsonify, request
+import banco  
+
+app = Flask(__name__)
+
+
+
+@app.route('/mecanicos', methods=['GET'])
+def listar_mecanicos_api():
+
+    try:
+        mecanicos = banco.listar_mecanicos()
+        return jsonify(mecanicos), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+@app.route('/mecanicos/<int:id>', methods=['GET'])
+def buscar_mecanico_api(id):
+
+    try:
+        mecanico = banco.buscar_mecanico_by_id(id)
+        if mecanico:
+            return jsonify(mecanico), 200
+        else:
+            return jsonify({'message': 'Mecânico não encontrado.'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+@app.route('/mecanicos', methods=['POST'])
+def cadastrar_mecanico_api():
+
+    try:
+        dados = request.json
+        banco.cadastrar_mecanico(dados)
+        return jsonify({'message': 'Mecânico cadastrado com sucesso!'}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+@app.route('/mecanicos/<int:id>', methods=['DELETE'])
+def excluir_mecanico_api(id):
+
+    try:
+        banco.excluir_mecanico(id)
+        return jsonify({'message': 'Mecânico excluído com sucesso!'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
